@@ -12,12 +12,11 @@
 
 char * uga_read_f ( char const * filename, int64_t const max_bytes )
 {
-        printf( "uga_read_f( %s, %ld )\n", filename, max_bytes );
-        FILE * file = open_file( filename, "r" );
+        FILE * file = uga_open_file( filename, "r" );
 
         if( uga_had_errs() ) return NULL;
 
-        int64_t fsize = get_filesize( filename );
+        int64_t fsize = uga_get_filesize( filename );
 
         int64_t to_read = fsize < max_bytes ? fsize : max_bytes ;
         char *  buffer  = ( char * ) malloc( sizeof( char ) * ( to_read + 1 ) );
@@ -27,10 +26,9 @@ char * uga_read_f ( char const * filename, int64_t const max_bytes )
                 uga_set_stdlib_err();
                 return NULL;
         }
-        printf( "created buffer of %ld bytes\n", to_read );
         int64_t read_b = fread( buffer, sizeof( char ), to_read, file );
 
-        printf( "read %ld bytes\n", read_b );
+        uga_close_file( file );
 
         if( read_b != to_read )
         {
@@ -45,7 +43,7 @@ char * uga_read_f ( char const * filename, int64_t const max_bytes )
 
 char * uga_read_all_f ( char const * filename )
 {
-        int64_t fsize = get_filesize( filename );
+        int64_t fsize = uga_get_filesize( filename );
 
         return uga_read_f( filename, fsize );
 }

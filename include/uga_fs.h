@@ -13,10 +13,10 @@
 #include <uga_err.h>
 
 
-FILE *  open_file ( char const * filename, char const * mode ) ;
-void   close_file ( FILE       * file                        ) ;
+FILE * uga_open_file  ( char const * filename, char const * mode ) ;
+void   uga_close_file ( FILE       * file                        ) ;
 
-int64_t get_filesize ( char const * filename ) ;
+int64_t uga_get_filesize ( char const * filename ) ;
 
 
 #endif // UGANET_FS_H_

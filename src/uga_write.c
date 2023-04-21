@@ -15,20 +15,24 @@ void _uga_fwrite ( FILE * fptr, char const * contents, int64_t const content_len
 
 void uga_write_f ( char const * filename, char const * contents, int64_t const content_len )
 {
-        FILE * file = open_file( filename, "w+" );
+        FILE * file = uga_open_file( filename, "w+" );
 
         if( uga_had_errs() ) return;
 
         _uga_fwrite( file, contents, content_len );
+
+        uga_close_file( file );
 }
 
 void uga_append ( char const * filename, char const * contents, int64_t const content_len )
 {
-        FILE * file = open_file( filename, "a+" );
+        FILE * file = uga_open_file( filename, "a+" );
 
         if( uga_had_errs() ) return;
 
         _uga_fwrite( file, contents, content_len );
+
+        uga_close_file( file );
 }
 
 void _uga_fwrite ( FILE * fptr, char const * contents, int64_t const content_len )

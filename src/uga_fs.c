@@ -9,7 +9,7 @@
 #include <uga_fs.h>
 
 
-FILE * open_file ( char const * filename, char const * mode )
+FILE * uga_open_file ( char const * filename, char const * mode )
 {
         FILE * fptr = fopen( filename, mode );
 
@@ -21,7 +21,7 @@ FILE * open_file ( char const * filename, char const * mode )
         return fptr;
 }
 
-void close_file ( FILE * file )
+void uga_close_file ( FILE * file )
 {
         if( fclose( file ) != 0 )
         {
@@ -29,10 +29,9 @@ void close_file ( FILE * file )
         }
 }
 
-int64_t get_filesize ( char const * filename )
+int64_t uga_get_filesize ( char const * filename )
 {
         struct stat st;
         stat( filename, &st );
-        printf( "stat.st_size: %ld\n", st.st_size );
         return st.st_size;
 }

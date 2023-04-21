@@ -4,8 +4,8 @@ project( uganet VERSION 0.0.1 )
 
 option( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-add_compile_options( -Wall -Wextra -pedantic -O0 )
-#add_compile_options( -Wall -Wextra -pedantic -Werror -O0 )
+#add_compile_options( -Wall -Wextra -pedantic -O0 )
+add_compile_options( -Wall -Wextra -pedantic -Werror -O0 )
 
 add_library( uganetlib STATIC   src/uga_err.c
                                 src/uga_fs.c
