@@ -10,8 +10,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <uga_err.h>
-
 
 FILE * uga_open_file  ( char const * filename, char const * mode ) ;
 void   uga_close_file ( FILE       * file                        ) ;

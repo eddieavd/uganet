@@ -6,6 +6,7 @@
 
 #include <sys/stat.h>
 
+#include <uga_err.h>
 #include <uga_fs.h>
 
 

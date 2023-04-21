@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#include <uga_err.h>
-
 
 void uga_write_f   ( char const * filename, char const * contents, int64_t const content_len ) ;
 void uga_write_s   ( int  const     sockid, char const * contents, int64_t const content_len ) ;

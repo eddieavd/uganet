@@ -7,8 +7,6 @@
 #ifndef UGANET_NET_H_
 #define UGANET_NET_H_
 
-#include <uga_err.h>
-
 
 typedef enum
 {

@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#include <uga_err.h>
-
 
 char * uga_read_f     ( char const * filename, int64_t const max_bytes ) ;
 char * uga_read_s     ( int  const     sockid, int64_t const max_bytes ) ;

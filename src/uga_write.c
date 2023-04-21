@@ -4,8 +4,9 @@
 //      uga_write.c
 //
 
-#include <uga_write.h>
+#include <uga_err.h>
 #include <uga_fs.h>
+#include <uga_write.h>
 
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"

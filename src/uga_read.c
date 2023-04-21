@@ -6,8 +6,9 @@
 
 #include <stdlib.h>
 
-#include <uga_read.h>
+#include <uga_err.h>
 #include <uga_fs.h>
+#include <uga_read.h>
 
 
 char * uga_read_f ( char const * filename, int64_t const max_bytes )
