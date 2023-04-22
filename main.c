@@ -9,30 +9,46 @@
 
 #include <uganet.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
 
-int main ()
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
+
+int main ( int argc, char ** argv )
 {
-        char const * filename = "test.txt";
+        ( void ) argc ;
+        ( void ) argv ;
 
-        uga_write_f( filename, "halo_buraz", 10 );
+        uga_config config = { AF_INET, UGA_UDP } ;
+
+        struct addrinfo * addr = uga_addrinfo( NULL, "8080", config );
 
         if( uga_had_errs() )
         {
-                printf( "uga::err: %s\n", uga_strerror() );
+                printf( "err: %s\n", uga_strerror() );
                 return 1;
         }
+        int sockfd = uga_sock_from_addr( addr );
 
-        char * content = uga_read_all_f( filename );
-
-        if( content == NULL )
+        if( uga_had_errs() )
         {
-                printf( "uga::err: %s\n", uga_strerror() );
+                printf( "err: %s\n", uga_strerror() );
+                return 1;
+        }
+        uga_bind( sockfd, "8080" );
+
+        if( uga_had_errs() )
+        {
+                printf( "err: %s\n", uga_strerror() );
                 return 1;
         }
 
-        printf( "%s\n", content );
 
-        free( content );
+        freeaddrinfo( addr );
 
 
         return 0;

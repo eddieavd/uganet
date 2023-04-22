@@ -10,9 +10,10 @@
 
 typedef enum
 {
-        UGA_ERR_NONE  ,
-        UGA_ERR_STDLIB,
-        UGA_ERR_GAIERR,
+        UGA_ERR_NONE   ,
+        UGA_ERR_STDLIB ,
+        UGA_ERR_GAIERR ,
+        UGA_ERR_BAD_ARG,
         UGA_ERR_UNKNOWN
 } err_type ;
 

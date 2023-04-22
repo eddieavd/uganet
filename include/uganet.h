@@ -7,6 +7,8 @@
 #ifndef UGANET_H_
 #define UGANET_H_
 
+#include <uga_err.h>
+#include <uga_fs.h>
 #include <uga_write.h>
 #include <uga_read.h>
 #include <uga_net.h>

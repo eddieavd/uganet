@@ -22,11 +22,14 @@ char const * uga_strerror ()
                         return strerror( uga_stderr );
                 case UGA_ERR_GAIERR:
                         return gai_strerror( uga_gaierr );
+                case UGA_ERR_BAD_ARG:
+                        return "bad args";
                 case UGA_ERR_UNKNOWN:
                         return "unknown error";
                 default:
                         return "generic error";
         }
+        uga_errno = UGA_ERR_NONE;
 }
 
 void uga_set_stdlib_err ()
