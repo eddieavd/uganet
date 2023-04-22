@@ -23,29 +23,16 @@ int main ( int argc, char ** argv )
         ( void ) argc ;
         ( void ) argv ;
 
-        uga_config config = { AF_INET, UGA_UDP } ;
+        uga_config config = { AF_INET, UGA_UDP, "8080" } ;
 
-        struct addrinfo * addr = uga_addrinfo( NULL, "8080", config );
+        struct addrinfo * addr = uga_addrinfo( NULL, &config );
+        uga_handle_err_and_exit( 1 );
 
-        if( uga_had_errs() )
-        {
-                printf( "err: %s\n", uga_strerror() );
-                return 1;
-        }
         int sockfd = uga_sock_from_addr( addr );
+        uga_handle_err_and_exit( 1 );
 
-        if( uga_had_errs() )
-        {
-                printf( "err: %s\n", uga_strerror() );
-                return 1;
-        }
-        uga_bind( sockfd, "8080" );
-
-        if( uga_had_errs() )
-        {
-                printf( "err: %s\n", uga_strerror() );
-                return 1;
-        }
+        uga_bind( sockfd, &config );
+        uga_handle_err_and_exit( 1 );
 
 
         freeaddrinfo( addr );

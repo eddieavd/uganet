@@ -26,7 +26,7 @@ typedef struct
 
 struct sockaddr_in uga_ip_to_net ( char const * remote_ip ) ;
 char * uga_net_to_ip ( struct sockaddr_in const * saddr ) ;
-struct addrinfo * uga_addrinfo ( char const * host, char const * port, uga_config const config ) ;
+struct addrinfo * uga_addrinfo ( char const * host, uga_config const * config ) ;
 
 int uga_socket ( uga_config const * config ) ;
 int uga_sock_from_addr ( struct addrinfo * addr ) ;

@@ -45,7 +45,7 @@ char * uga_net_to_ip ( struct sockaddr_in const * saddr )
         return ip;
 }
 
-struct addrinfo * uga_addrinfo ( char const * host, char const * port, uga_config const config )
+struct addrinfo * uga_addrinfo ( char const * host, uga_config const * config )
 {
         int status ;
 
@@ -54,11 +54,11 @@ struct addrinfo * uga_addrinfo ( char const * host, char const * port, uga_confi
 
         memset( &hints, 0, sizeof( hints ) );
 
-        hints.ai_family   = config.family;
+        hints.ai_family   = config->family;
         hints.ai_flags    = AI_PASSIVE;
-        hints.ai_socktype = config.protocol == UGA_UDP ? SOCK_DGRAM : SOCK_STREAM ;
+        hints.ai_socktype = config->protocol == UGA_UDP ? SOCK_DGRAM : SOCK_STREAM ;
 
-        if( ( status = getaddrinfo( host, port, &hints, &res ) ) != 0 )
+        if( ( status = getaddrinfo( host, config->port, &hints, &res ) ) != 0 )
         {
                 uga_set_gai_err( status );
                 return NULL;

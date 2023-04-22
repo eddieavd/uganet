@@ -33,5 +33,8 @@ void uga_set_gai_err    ( int gai_err ) ;
 
 int uga_had_errs () ;
 
+void uga_handle_err          (                  ) ;
+void uga_handle_err_and_exit ( int const status ) ;
+
 
 #endif // UGANET_ERR_H_

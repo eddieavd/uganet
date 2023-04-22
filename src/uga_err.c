@@ -6,6 +6,8 @@
 
 #include <uga_err.h>
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -48,3 +50,21 @@ int uga_had_errs ()
 {
         return uga_errno != UGA_ERR_NONE;
 }
+
+void uga_handle_err ()
+{
+        if( uga_errno != UGA_ERR_NONE )
+        {
+                fprintf( stderr, "uga::err: %s\n", uga_strerror() );
+        }
+}
+
+void uga_handle_err_and_exit ( int const status )
+{
+        if( uga_errno != UGA_ERR_NONE )
+        {
+                fprintf( stderr, "uga::err: %s\n", uga_strerror() );
+                exit( status );
+        }
+}
+

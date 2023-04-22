@@ -29,14 +29,13 @@ char * uga_read_f ( char const * filename, int64_t const max_bytes )
         }
         int64_t read_b = fread( buffer, sizeof( char ), to_read, file );
 
-        uga_close_file( file );
-
         if( read_b != to_read )
         {
                 uga_set_stdlib_err();
                 free( buffer );
                 return NULL;
         }
+        uga_close_file( file );
         buffer[ to_read ] = '\0';
 
         return buffer;
