@@ -60,19 +60,3 @@ char * uga_read_all_s ( int const sockid )
 {
         return uga_read_s( sockid, 0 );
 }
-
-char * uga_recv ( char const * remote_host, char const * remote_port )
-{
-        ( void ) remote_host ;
-        ( void ) remote_port ;
-
-        return NULL;
-}
-
-char * uga_recv_all ( char const * remote_host, char const * remote_port )
-{
-        ( void ) remote_host ;
-        ( void ) remote_port ;
-
-        return NULL;
-}

@@ -31,7 +31,8 @@ char const * uga_strerror () ;
 void uga_set_stdlib_err (             ) ;
 void uga_set_gai_err    ( int gai_err ) ;
 
-int uga_had_errs () ;
+int  uga_had_errs () ;
+void uga_clr_errs () ;
 
 void uga_handle_err          (                  ) ;
 void uga_handle_err_and_exit ( int const status ) ;

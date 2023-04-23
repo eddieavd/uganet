@@ -7,31 +7,23 @@
 #include <uga_err.h>
 #include <uga_net.h>
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#define UGA_BACKLOG 16
 
 
-
-struct sockaddr_in uga_ip_to_net ( char const * remote_ip )
+sockaddr_in_t uga_ip_to_net ( char const * remote_ip )
 {
-        struct sockaddr_in saddr;
+        sockaddr_in_t saddr;
 
         int err = inet_pton( AF_INET, remote_ip, &( saddr.sin_addr ) );
         if( err != 1 )
         {
                 uga_set_stdlib_err();
         }
+        uga_clr_errs();
         return saddr;
 }
 
-char * uga_net_to_ip ( struct sockaddr_in const * saddr )
+char * uga_net_to_ip ( sockaddr_in_t const * saddr )
 {
         char * ip = ( char * ) malloc( sizeof( char ) * INET_ADDRSTRLEN );
 
@@ -42,15 +34,16 @@ char * uga_net_to_ip ( struct sockaddr_in const * saddr )
                 uga_set_stdlib_err();
                 return NULL;
         }
+        uga_clr_errs();
         return ip;
 }
 
-struct addrinfo * uga_addrinfo ( char const * host, uga_config const * config )
+addrinfo_t * uga_addrinfo ( char const * host, uga_config const * config )
 {
         int status ;
 
-        struct addrinfo hints ;
-        struct addrinfo * res ;
+        addrinfo_t hints ;
+        addrinfo_t * res ;
 
         memset( &hints, 0, sizeof( hints ) );
 
@@ -63,6 +56,7 @@ struct addrinfo * uga_addrinfo ( char const * host, uga_config const * config )
                 uga_set_gai_err( status );
                 return NULL;
         }
+        uga_clr_errs();
         return res;
 }
 
@@ -86,10 +80,11 @@ int uga_socket ( uga_config const * config )
         {
                 uga_set_stdlib_err();
         }
+        uga_clr_errs();
         return sockfd;
 }
 
-int uga_sock_from_addr ( struct addrinfo * addr )
+int uga_sock_from_addr ( addrinfo_t const * addr )
 {
         int sockfd = socket( addr->ai_family, addr->ai_socktype, addr->ai_protocol );
 
@@ -97,24 +92,38 @@ int uga_sock_from_addr ( struct addrinfo * addr )
         {
                 uga_set_stdlib_err();
         }
+        uga_clr_errs();
         return sockfd;
+}
+
+int uga_close_sock ( int const sockfd )
+{
+        int err = close( sockfd );
+        if( err == -1 )
+        {
+                uga_set_stdlib_err();
+                return -1;
+        }
+        uga_clr_errs();
+        return 0;
 }
 
 int uga_bind ( int sockfd, uga_config const * config )
 {
         int err;
-        struct sockaddr_in local_addr;
+        sockaddr_in_t local_addr;
 
         local_addr.sin_family      = config->family;
         local_addr.sin_port        = htons( atoi( config->port ) );
         local_addr.sin_addr.s_addr = INADDR_ANY;
 
-        err = bind( sockfd, ( struct sockaddr * ) &local_addr, sizeof( local_addr ) );
+        err = bind( sockfd, ( sockaddr_t * ) &local_addr, sizeof( local_addr ) );
         if( err != 0 )
         {
                 uga_set_stdlib_err();
                 return -1;
         }
+        uga_clr_errs();
         return 0;
 }
 
@@ -130,6 +139,23 @@ int uga_get_bound_sock ( uga_config const * config )
         {
                 return -1;
         }
+        uga_clr_errs();
+        return sockfd;
+}
+
+int uga_connect_to_remote ( char const * remote_host, uga_config const * config )
+{
+        addrinfo_t * remote_addr = uga_addrinfo( remote_host, config );
+
+        int sockfd = uga_sock_from_addr( remote_addr );
+
+        int err = connect( sockfd, remote_addr->ai_addr, remote_addr->ai_addrlen );
+        if( err == -1 )
+        {
+                uga_set_stdlib_err();
+                return -1;
+        }
+        freeaddrinfo( remote_addr );
         return sockfd;
 }
 
@@ -149,81 +175,120 @@ int uga_listen_on_port ( uga_config const * config )
                 uga_set_stdlib_err();
                 return -1;
         }
-        return 0;
-}
-
-int uga_accept_connection ( int sockfd, uga_config const * config, void( *handle_connection )() )
-{
-
-}
-
-int uga_tcp_connect ( char const * remote_host, char const * remote_port )
-{
-        int sockfd;
-        int    err;
-
-        struct sockaddr_in remote_addr;
-        struct addrinfo hints, *res;
-
-        memset( &hints, 0, sizeof( hints ) );
-
-        hints.ai_family =      AF_INET ;
-        hints.ai_flags |= AI_CANONNAME ;
-
-        if( ( err = getaddrinfo( remote_host, NULL, &hints, &res ) ) )
-        {
-                uga_set_gai_err( err );
-                return -1;
-        }
-        if( ( sockfd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
-        {
-                uga_set_stdlib_err();
-                return -1;
-        }
-
-        remote_addr.sin_family = AF_INET;
-        remote_addr.sin_port   = htons( atoi( remote_port ) );
-        remote_addr.sin_addr   = ( ( struct sockaddr_in * ) res->ai_addr )->sin_addr;
-
-        memset( remote_addr.sin_zero, '\0', sizeof( remote_addr.sin_zero ) );
-
-        if( connect( sockfd, ( struct sockaddr * ) &remote_addr, sizeof( remote_addr ) ) == -1 )
-        {
-                uga_set_stdlib_err();
-                return -1;
-        }
+        uga_clr_errs();
         return sockfd;
 }
 
-int uga_start_listen ( char const * local_port, uga_config const config, void ( *handle_request )( char const * request_data ) )
+int uga_accept_and_handle ( int sockfd, int( *handle_connection )( int const clientfd ) )
 {
-        ( void ) config ;
-        ( void ) handle_request ;
+        ( void )            sockfd ;
+        ( void ) handle_connection ;
 
-        int fd;
+        sockaddr_storage_t addr_str ;
+        socklen_t          addr_len = sizeof( addr_str ) ;
 
-        struct sockaddr_in local_addr;
-
-        if( ( fd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
+        int clientfd = accept( sockfd, ( sockaddr_t * ) &addr_str, &addr_len );
+        if( clientfd == -1 )
         {
                 uga_set_stdlib_err();
                 return -1;
         }
-        local_addr.sin_family = AF_INET;
-        local_addr.sin_port   = htons( atoi( local_port ) );
-        local_addr.sin_addr.s_addr = INADDR_ANY;
+        uga_clr_errs();
 
-        memset( local_addr.sin_zero, '\0', sizeof( local_addr.sin_zero ) );
-
-        if( bind( fd, ( struct sockaddr * ) &local_addr, sizeof( local_addr ) ) == -1 )
-        {
-                uga_set_stdlib_err();
-                return -1;
-        }
-        if( listen( fd, UGA_BACKLOG ) == -1 )
-        {
-                uga_set_stdlib_err();
-                return -1;
-        }
-        return fd;
+        return handle_connection( clientfd );
 }
+
+int uga_send ( int sockfd, char const * data, int64_t const data_len )
+{
+        int64_t bsent = send( sockfd, data, data_len, 0 );
+        if( bsent == -1 )
+        {
+                uga_set_stdlib_err();
+                return -1;
+        }
+        if( bsent < data_len )
+        {
+                return uga_send( sockfd, data + bsent, data_len - bsent );
+        }
+        uga_clr_errs();
+
+        return 0;
+}
+
+char * uga_recv ( int sockfd, int * bytes_recvd )
+{
+        char * buff = ( char * ) calloc( UGA_RECV_BUFFLEN, sizeof( char ) );
+        if( !buff )
+        {
+                uga_set_stdlib_err();
+                return NULL;
+        }
+        int recvd = recv( sockfd, buff, UGA_RECV_BUFFLEN, MSG_WAITALL );
+        if( recvd == -1 )
+        {
+                uga_set_stdlib_err();
+                free( buff );
+                return NULL;
+        }
+        if( recvd == 0 )
+        {
+                free( buff );
+        }
+        *bytes_recvd = recvd;
+        return buff;
+}
+
+char * uga_recv_all ( int sockfd, int * bytes_recvd )
+{
+        int recvd       = 0;
+        int total_recvd = 0;
+        int buff_size   = UGA_RECV_BUFFLEN;
+
+        char * buff = ( char * ) malloc( sizeof( char ) * UGA_RECV_BUFFLEN );
+        if( !buff )
+        {
+                uga_set_stdlib_err();
+                return NULL;
+        }
+        while( !uga_had_errs() )
+        {
+                char * tmp = uga_recv( sockfd, &recvd );
+                if( recvd == 0 || uga_had_errs() )
+                {
+                        break;
+                }
+                if( buff_size < total_recvd + recvd )
+                {
+                        buff = ( char * ) realloc( buff, sizeof( char ) * total_recvd + recvd + UGA_RECV_BUFFLEN );
+                }
+                memcpy( buff + total_recvd, tmp, recvd );
+                total_recvd += recvd;
+                free( tmp );
+        }
+        *bytes_recvd = total_recvd;
+        return buff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

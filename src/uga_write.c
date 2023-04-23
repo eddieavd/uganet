@@ -52,13 +52,3 @@ void uga_write_all ( int const sockid, char const * contents, int64_t const cont
 {
 
 }
-
-void uga_send ( char const * remote_host, char const * remote_port, char const * contents, int64_t const content_len )
-{
-
-}
-
-void uga_send_all ( char const * remote_host, char const * remote_port, char const * contents, int64_t const content_len )
-{
-
-}

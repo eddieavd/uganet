@@ -51,6 +51,11 @@ int uga_had_errs ()
         return uga_errno != UGA_ERR_NONE;
 }
 
+void uga_clr_errs ()
+{
+        uga_errno = UGA_ERR_NONE;
+}
+
 void uga_handle_err ()
 {
         if( uga_errno != UGA_ERR_NONE )
