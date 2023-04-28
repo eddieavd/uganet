@@ -7,6 +7,8 @@
 #include <uga_err.h>
 #include <uga_net.h>
 
+#include <stdio.h>
+
 #define UGA_BACKLOG 16
 
 
@@ -96,6 +98,18 @@ int uga_sock_from_addr ( addrinfo_t const * addr )
         return sockfd;
 }
 
+int uga_shutdown ( int const sockfd, shutdown_mode const mode )
+{
+        int err = shutdown( sockfd, mode );
+        if( err == -1 )
+        {
+                uga_set_stdlib_err();
+                return -1;
+        }
+        uga_clr_errs();
+        return 0;
+}
+
 int uga_close_sock ( int const sockfd )
 {
         int err = close( sockfd );
@@ -181,9 +195,6 @@ int uga_listen_on_port ( uga_config const * config )
 
 int uga_accept_and_handle ( int sockfd, int( *handle_connection )( int const clientfd ) )
 {
-        ( void )            sockfd ;
-        ( void ) handle_connection ;
-
         sockaddr_storage_t addr_str ;
         socklen_t          addr_len = sizeof( addr_str ) ;
 
@@ -244,27 +255,33 @@ char * uga_recv_all ( int sockfd, int * bytes_recvd )
         int total_recvd = 0;
         int buff_size   = UGA_RECV_BUFFLEN;
 
-        char * buff = ( char * ) malloc( sizeof( char ) * UGA_RECV_BUFFLEN );
+        char * buff = ( char * ) calloc( UGA_RECV_BUFFLEN, sizeof( char ) );
         if( !buff )
         {
                 uga_set_stdlib_err();
                 return NULL;
         }
+        printf( "uga::recv_all: allocated buffer.\n" );
         while( !uga_had_errs() )
         {
+                printf( "uga::recv_all: calling recv...\n" );
                 char * tmp = uga_recv( sockfd, &recvd );
                 if( recvd == 0 || uga_had_errs() )
                 {
+                        printf( "uga::recv_all: recvd %d bytes, uga_errno is %d\n", recvd, uga_errno );
                         break;
                 }
                 if( buff_size < total_recvd + recvd )
                 {
                         buff = ( char * ) realloc( buff, sizeof( char ) * total_recvd + recvd + UGA_RECV_BUFFLEN );
+                        printf( "uga::recv_all: reallocated buffer.\n" );
                 }
+                printf( "uga::recv_all: received %d bytes!\n", recvd );
                 memcpy( buff + total_recvd, tmp, recvd );
                 total_recvd += recvd;
                 free( tmp );
         }
+        printf( "uga::recv_all: received %d bytes in total.\n", total_recvd );
         *bytes_recvd = total_recvd;
         return buff;
 }

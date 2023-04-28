@@ -15,8 +15,14 @@ add_library( uganetlib STATIC   src/uga_err.c
 )
 target_include_directories( uganetlib PUBLIC include )
 
-add_executable( ugatest main.c )
+add_executable( ugatest   main.c )
+add_executable( client  client.c )
+add_executable( server  server.c )
 
 target_link_libraries( ugatest uganetlib )
+target_link_libraries( client  uganetlib )
+target_link_libraries( server  uganetlib )
 
 target_include_directories( ugatest PUBLIC include )
+target_include_directories( client  PUBLIC include )
+target_include_directories( server  PUBLIC include )

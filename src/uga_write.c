@@ -14,7 +14,7 @@
 
 void _uga_fwrite ( FILE * fptr, char const * contents, int64_t const content_len ) ;
 
-void uga_write_f ( char const * filename, char const * contents, int64_t const content_len )
+void uga_write ( char const * filename, char const * contents, int64_t const content_len )
 {
         FILE * file = uga_open_file( filename, "w+" );
 
@@ -41,14 +41,4 @@ void _uga_fwrite ( FILE * fptr, char const * contents, int64_t const content_len
         int64_t wrote = fwrite( contents, sizeof( char ), content_len, fptr );
 
         if( wrote == -1 || wrote != content_len ) uga_set_stdlib_err();
-}
-
-void uga_write_s ( int const sockid, char const * contents, int64_t const content_len )
-{
-
-}
-
-void uga_write_all ( int const sockid, char const * contents, int64_t const content_len )
-{
-
 }

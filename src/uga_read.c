@@ -11,7 +11,7 @@
 #include <uga_read.h>
 
 
-char * uga_read_f ( char const * filename, int64_t const max_bytes )
+char * uga_read_some ( char const * filename, int64_t const max_bytes )
 {
         FILE * file = uga_open_file( filename, "r" );
 
@@ -41,11 +41,11 @@ char * uga_read_f ( char const * filename, int64_t const max_bytes )
         return buffer;
 }
 
-char * uga_read_all_f ( char const * filename )
+char * uga_read_file ( char const * filename )
 {
         int64_t fsize = uga_get_filesize( filename );
 
-        return uga_read_f( filename, fsize );
+        return uga_read_some( filename, fsize );
 }
 
 char * uga_read_s ( int const sockid, int64_t const max_bytes )

@@ -27,6 +27,13 @@ typedef enum
         UGA_TCP
 } uga_protocol ;
 
+typedef enum
+{
+        UGA_NO_RECV,
+        UGA_NO_SEND,
+        UGA_NONE
+} shutdown_mode ;
+
 typedef struct
 {
         int          family   ;
@@ -50,7 +57,8 @@ addrinfo_t * uga_addrinfo ( char const * host, uga_config const * config ) ;
 int uga_socket         ( uga_config const * config ) ;
 int uga_sock_from_addr ( addrinfo_t const *   addr ) ;
 
-int uga_close_sock ( int const sockfd ) ;
+int uga_shutdown   ( int const sockfd, shutdown_mode const mode ) ;
+int uga_close_sock ( int const sockfd                           ) ;
 
 int uga_bind ( int sockfd, uga_config const * config ) ;
 
