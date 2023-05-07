@@ -209,7 +209,7 @@ int uga_accept_and_handle ( int sockfd, int( *handle_connection )( int const cli
         return handle_connection( clientfd );
 }
 
-int uga_send ( int sockfd, char const * data, int64_t const data_len )
+int uga_send ( int const sockfd, char const * data, int64_t const data_len )
 {
         int64_t bsent = send( sockfd, data, data_len, 0 );
         if( bsent == -1 )
@@ -226,7 +226,7 @@ int uga_send ( int sockfd, char const * data, int64_t const data_len )
         return 0;
 }
 
-char * uga_recv ( int sockfd, int * bytes_recvd )
+char * uga_recv ( int const sockfd, int * bytes_recvd )
 {
         char * buff = ( char * ) calloc( UGA_RECV_BUFFLEN, sizeof( char ) );
         if( !buff )
@@ -234,7 +234,9 @@ char * uga_recv ( int sockfd, int * bytes_recvd )
                 uga_set_stdlib_err();
                 return NULL;
         }
-        int recvd = recv( sockfd, buff, UGA_RECV_BUFFLEN, MSG_WAITALL );
+        printf( "uga::recv: allocated buffer.\n" );
+        printf( "uga::recv: calling recv...\n" );
+        int recvd = recv( sockfd, buff, UGA_RECV_BUFFLEN, 0 );
         if( recvd == -1 )
         {
                 uga_set_stdlib_err();
@@ -244,12 +246,14 @@ char * uga_recv ( int sockfd, int * bytes_recvd )
         if( recvd == 0 )
         {
                 free( buff );
+                uga_errno = UGA_ERR_EOF;
         }
+        printf( "uga::recv: received %d bytes!\n", recvd );
         *bytes_recvd = recvd;
         return buff;
 }
 
-char * uga_recv_all ( int sockfd, int * bytes_recvd )
+char * uga_recv_all ( int const sockfd, int * bytes_recvd )
 {
         int recvd       = 0;
         int total_recvd = 0;
@@ -286,6 +290,20 @@ char * uga_recv_all ( int sockfd, int * bytes_recvd )
         return buff;
 }
 
+char * uga_recv_some ( int const sockfd, int * max_bytes )
+{
+        int recvd = 0;
+        char * data = uga_recv( sockfd, &recvd );
+
+        if( recvd >= *max_bytes )
+        {
+                return data;
+        }
+        else
+        {
+                return NULL;
+        }
+}
 
 
 

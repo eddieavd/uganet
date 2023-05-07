@@ -66,20 +66,19 @@ int uga_get_bound_sock ( uga_config const * config ) ;
 
 int uga_connect_to_remote ( char const * remote_host, uga_config const * config ) ;
 
-int uga_tcp_connect      ( char const * remote_host, char const * remote_port                          ) ;
-int uga_tcp_connect_from ( char const * remote_host, char const * remote_port, char const * local_port ) ;
-
 int uga_listen_on_port ( uga_config const * config ) ;
 
 int uga_accept_and_handle ( int sockfd, int( *handle_connection )( int const clientfd ) ) ;
 
-int    uga_send       ( int sockfd, char const *        data, int64_t const data_len ) ;
-char * uga_recv       ( int sockfd, int        * bytes_recvd                         ) ;
-char * uga_recv_all   ( int sockfd, int        * bytes_recvd                         ) ;
-int    uga_recv_some () ;
+int    uga_send      ( int const sockfd, char const *        data, int64_t const data_len ) ;
+char * uga_recv      ( int const sockfd, int        * bytes_recvd                         ) ;
+char * uga_recv_all  ( int const sockfd, int        * bytes_recvd                         ) ;
+char * uga_recv_some ( int const sockfd, int        *   max_bytes                         ) ;
 
-char const * uga_hear_say ( char const * remote_host, char const * remote_port, char const * content, char const * content_len ) ;
-char const * uga_say_hear ( char const * remote_host, char const * remote_port, char const * content, char const * content_len ) ;
+char * uga_hear_say ( char const * remote_host, char const * remote_port, char const * content, char const * content_len ) ;
+char * uga_say_hear ( char const * remote_host, char const * remote_port, char const * content, char const * content_len ) ;
+
+int uga_buga_send ( char const * remote_host, char const * remote_port, char const * content, char const * content_len ) ;
 
 
 #endif // UGANET_NET_H_
